@@ -16,17 +16,33 @@ data:
       format: text
     oauth2:
       skipApprovalScreen: true
-    enablePasswordDB: true
-    staticPasswords:
-    - email: user@example.com
-      hash: $2y$12$4K/VkmDd1q1Orb3xAt82zu8gk7Ad6ReFR4LCP9UeYE90NLiN9Df72
-      # https://github.com/dexidp/dex/pull/1601/commits
-      # FIXME: Use hashFromEnv instead
-      username: user
-      userID: "15841185641784"
     staticClients:
-    # https://github.com/dexidp/dex/pull/1664
     - idEnv: OIDC_CLIENT_ID
       redirectURIs: ["/login/oidc"]
       name: 'Dex Login Application'
       secretEnv: OIDC_CLIENT_SECRET
+    connectors:
+    - type: ldap
+      id: ldap
+      name: LDAP
+      config:
+        host: ldap-service.ldap.svc.cluster.local:636
+        insecureNoSSL: false
+        insecureSkipVerify: false
+        rootCA: /etc/dex/tls/ca.crt
+        bindDN: cn=admin,dc=tilyes,dc=eu
+        bindPW: $LDAP_ADMIN_PASSWORD
+        usernamePrompt: username
+        userSearch:
+          baseDN: ou=People,dc=tilyes,dc=eu
+          filter: "(objectClass=inetOrgPerson)"
+          username: uid
+          idAttr: uid
+          emailAttr: mail
+          nameAttr: givenName
+        groupSearch:
+          baseDN: ou=Groups,dc=tilyes,dc=eu
+          filter: "(objectClass=groupOfNames)"
+          userAttr: DN
+          groupAttr: member
+          nameAttr: cn

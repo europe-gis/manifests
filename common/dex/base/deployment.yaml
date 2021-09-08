@@ -25,12 +25,16 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /etc/dex/cfg
+        - name: tls
+          mountPath: /etc/dex/tls
         env:
           - name: KUBERNETES_POD_NAMESPACE
             value: kubeflow
         envFrom:
           - secretRef:
               name: dex-oidc-client
+          - secretRef:
+              name: ldap-secret
       volumes:
       - name: config
         configMap:
@@ -38,3 +42,6 @@ spec:
           items:
           - key: config.yaml
             path: config.yaml
+      - name: tls
+        secret:
+          secretName: ldap-service-tls
